@@ -1,31 +1,24 @@
-@echo off
-echo ---------------------------
-echo Puxando alterações remotas
-echo ---------------------------
-git pull origin main
+:: 1. Garante que está na main
+git checkout main
 
-echo ---------------------------
-echo Fazendo commit local
-echo ---------------------------
+:: 2. Adiciona tudo e comita na main
 git add .
-git commit -m "Atualização local - main e dev"
+git commit -m "Atualização na main"
 
-echo ---------------------------
-echo Enviando para main
-echo ---------------------------
+:: 3. Sobe a main
 git push origin main
 
-echo ---------------------------
-echo Atualizando branch dev
-echo ---------------------------
+:: 4. Vai para dev e atualiza com base na main
 git checkout dev
+git pull origin dev
 git merge main
 git push origin dev
 
-echo ---------------------------
-echo Voltando para main
-echo ---------------------------
-git checkout main
+:: 5. Vai para geinian e atualiza com base na dev
+git checkout geinian
+git pull origin geinian
+git merge dev
+git push origin geinian
 
-echo ✅ Finalizado com sucesso.
-pause
+:: 6. Volta pra main
+git checkout main
