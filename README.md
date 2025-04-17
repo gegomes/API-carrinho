@@ -239,12 +239,6 @@ Para simular diversos usuários, basta passar `user_id` diferente em cada requis
 
 Repositório público: https://github.com/seu-usuario/api-carrinho
 
-Certifique-se de ter commits claros e incrementalmente descritos, por exemplo:
-- `feat: criar script create-db e tabela carrinho`
-- `feat: adicionar rota POST /carrinho/adicionar`
-- `fix: ajustar status code na remoção de item`
-
----
 
 ## Contribuição
 
