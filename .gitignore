@@ -5,3 +5,4 @@
 .idea
 *.sqlite
 .DS_Store
+.qodo
