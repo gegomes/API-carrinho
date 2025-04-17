@@ -1,31 +1,122 @@
-# 🛒 API de Carrinho de Compras (Slim + SQLite)
+# API de Carrinho de Compras (Slim + SQLite)
 
-API RESTful em PHP utilizando Slim Framework e SQLite para gestão de carrinho de compras com suporte a múltiplos usuários simultâneos.
+Este projeto implementa uma API RESTful em PHP utilizando o Slim Framework e SQLite para gerenciamento de um carrinho de compras com suporte a múltiplos usuários.
 
 ---
 
-## 🚀 Instruções para Executar
+## 📋 Sumário
 
-```bash
-# Clonar o projeto
-git clone https://github.com/seu-usuario/api-carrinho.git
-cd api-carrinho
+- [Tecnologias](#tecnologias)
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação](#instalação)
+- [Configuração do Banco de Dados](#configuração-do-banco-de-dados)
+- [Estrutura de Pastas](#estrutura-de-pastas)
+- [Rotas da API](#rotas-da-api)
+  - [Adicionar Item ao Carrinho](#1-adicionar-item-ao-carrinho)
+  - [Listar Itens do Carrinho](#2-listar-itens-do-carrinho)
+  - [Remover Item do Carrinho](#3-remover-item-do-carrinho)
+  - [Limpar Carrinho](#4-limpar-carrinho)
+  - [Finalizar Compra](#5-finalizar-compra)
+  - [Histórico de Compras](#6-histórico-de-compras)
+- [Teste com cURL](#teste-com-curl)
+- [Fluxo de Usuários Simultâneos](#fluxo-de-usuários-simultâneos)
+- [Publicação no GitHub](#publicação-no-github)
+- [Contribuição](#contribuição)
+- [Licença](#licença)
 
-# Instalar dependências
-composer install
+---
 
-# Criar o banco de dados
-php scripts/create-db.php
+## Tecnologias
 
-# Iniciar o servidor
-php -S localhost:8000 -t public
+- PHP 8.x
+- [Slim Framework 4](https://www.slimframework.com/)
+- SQLite 3
+- Composer para gerenciamento de dependências
+
+---
+
+## Pré-requisitos
+
+- PHP 8.0 ou superior
+- Composer 2.x
+- Extensão PDO_SQLITE habilitada
+
+---
+
+## Instalação
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/api-carrinho.git
+   cd api-carrinho
+   ```
+
+2. Instale as dependências:
+   ```bash
+   composer install
+   ```
+
+3. Crie o banco de dados SQLite:
+   ```bash
+   php scripts/create-db.php
+   ```
+
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   php -S localhost:8000 -t public
+   ```
+
+O servidor ficará disponível em `http://localhost:8000`.
+
+---
+
+## Configuração do Banco de Dados
+
+O script `scripts/create-db.php` cria duas tabelas principais:
+
+- **carrinho**: armazena itens em aberto por `user_id`.
+- **compras**: histórico de compras finalizadas.
+
+Caso queira adicionar uma tabela de `produtos`, pode utilizar o seguinte SQL:
+
+```sql
+CREATE TABLE produtos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  descricao TEXT,
+  preco REAL NOT NULL,
+  estoque INTEGER NOT NULL DEFAULT 0,
+  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 ---
 
-## 📦 Rotas da API
+## Estrutura de Pastas
 
-### 1. Adicionar item ao carrinho
+```
+api-carrinho/
+├── database/              # Arquivo SQLite (carrinho.sqlite)
+├── public/                # Ponto de entrada público
+│   └── index.php          # Bootstrap do Slim
+├── scripts/               # Scripts auxiliares
+│   └── create-db.php      # Cria o banco de dados
+├── src/                   # Código-fonte
+│   ├── Models/
+│   │   ├── Carrinho.php
+│   │   └── CompraFinalizada.php
+│   └── Routes/
+│       ├── carrinho.php
+│       └── produtos.php   # (Opcional) CRUD de produtos
+├── composer.json          # Dependências e autoload
+└── README.md              # Documentação do projeto
+```
+
+---
+
+## Rotas da API
+
+### 1. Adicionar Item ao Carrinho
 ```
 POST /carrinho/adicionar
 ```
@@ -33,46 +124,54 @@ POST /carrinho/adicionar
 ```json
 {
   "user_id": 1,
-  "produto": "notebook",
-  "quantidade": 2,
-  "preco": 1000
+  "produto_id": 42,
+  "quantidade": 2
 }
 ```
-**Descrição:** Adiciona um novo item ao carrinho do usuário informado.
+**Descrição:**
+- Recupera preço e estoque do produto a partir de `produto_id`.
+- Valida disponibilidade.
+- Insere item na tabela `carrinho` e decremeta o estoque (opcional).
 
 ---
 
-### 2. Listar itens do carrinho do usuário
+### 2. Listar Itens do Carrinho
 ```
 GET /carrinho/{userId}
 ```
-**Descrição:** Retorna todos os itens no carrinho do usuário.
+**Descrição:**
+Retorna todos os itens no carrinho do usuário.
 
 ---
 
-### 3. Remover item do carrinho do usuário
+### 3. Remover Item do Carrinho
 ```
 DELETE /carrinho/{userId}/item/{id}
 ```
-**Descrição:** Remove um item específico do carrinho do usuário.
+**Descrição:**
+Remove o item especificado pelo `id` e restaura o estoque (se implementado).
 
 ---
 
-### 4. Limpar carrinho do usuário
+### 4. Limpar Carrinho
 ```
 DELETE /carrinho/{userId}/limpar
 ```
-**Descrição:** Remove todos os itens do carrinho do usuário.
+**Descrição:**
+Remove todos os itens do carrinho do usuário.
 
 ---
 
-### 5. Finalizar compra do usuário
+### 5. Finalizar Compra
 ```
 POST /carrinho/{userId}/finalizar
 ```
-**Descrição:** Finaliza a compra e armazena o histórico.
+**Descrição:**
+- Calcula o total de todos os itens.
+- Insere um registro em `compras` com `total` e `finalizado_em`.
+- Limpa o carrinho ativo.
 
-**Resposta:**
+**Resposta Exemplo:**
 ```json
 {
   "success": true,
@@ -82,13 +181,14 @@ POST /carrinho/{userId}/finalizar
 
 ---
 
-### 6. Listar compras finalizadas do usuário
+### 6. Histórico de Compras
 ```
 GET /compras/{userId}
 ```
-**Descrição:** Retorna o histórico de compras finalizadas de um usuário.
+**Descrição:**
+Retorna o histórico de compras finalizadas, incluindo detalhes dos itens em `itens_json`.
 
-**Resposta:**
+**Resposta Exemplo:**
 ```json
 [
   {
@@ -97,11 +197,7 @@ GET /compras/{userId}
     "total": 2000,
     "finalizado_em": "2025-04-16 00:00:00",
     "itens": [
-      {
-        "produto": "notebook",
-        "quantidade": 2,
-        "preco": 1000
-      }
+      { "produto": "notebook", "quantidade": 2, "preco": 1000 }
     ]
   }
 ]
@@ -109,13 +205,11 @@ GET /compras/{userId}
 
 ---
 
-## 🧪 Testes com curl (Exemplos)
+## Teste com cURL
 
 ```bash
 # Adicionar item
-curl -X POST http://localhost:8000/carrinho/adicionar \
-     -H "Content-Type: application/json" \
-     -d '{"user_id": 1, "produto": "Mouse", "quantidade": 1, "preco": 50}'
+curl -X POST http://localhost:8000/carrinho/adicionar      -H "Content-Type: application/json"      -d '{"user_id": 1, "produto_id": 42, "quantidade": 1}'
 
 # Listar itens
 curl http://localhost:8000/carrinho/1
@@ -135,34 +229,29 @@ curl http://localhost:8000/compras/1
 
 ---
 
-## 🧠 Observações
-- Cada rota está preparada para simular usuários distintos.
-- O campo `user_id` é usado para isolar as operações por usuário.
-- O histórico de compras inclui todos os itens finalizados por usuário.
-- Os itens são armazenados no campo `itens_json` e retornados no campo `itens` já decodificados.
+## Fluxo de Usuários Simultâneos
+
+Para simular diversos usuários, basta passar `user_id` diferente em cada requisição. Cada carrinho é isolado por `user_id`, garantindo operações independentes.
 
 ---
 
-## 📁 Estrutura de Pastas
-```
-api-carrinho/
-├── database/
-│   └── carrinho.sqlite
-├── public/
-│   └── index.php
-├── scripts/
-│   └── create-db.php
-├── src/
-│   ├── Models/
-│   │   ├── Carrinho.php
-│   │   └── CompraFinalizada.php
-│   └── Routes/
-│       └── carrinho.php
-├── composer.json
-└── README.md
-```
+## Publicação no GitHub
+
+Repositório público: https://github.com/seu-usuario/api-carrinho
+
+Certifique-se de ter commits claros e incrementalmente descritos, por exemplo:
+- `feat: criar script create-db e tabela carrinho`
+- `feat: adicionar rota POST /carrinho/adicionar`
+- `fix: ajustar status code na remoção de item`
 
 ---
 
-## 👤 Autor
-**Geinian Teixeira**
+## Contribuição
+
+Sinta-se à vontade para abrir issues e pull requests. Para clonar e rodar localmente, siga as instruções acima.
+
+---
+
+## Licença
+
+MIT © Geinian Teixeira
