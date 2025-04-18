@@ -44,7 +44,7 @@ $produtos = [
     ['Micro-ondas 30L', 'Função descongelar, display digital', 599.00, 'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTRUpgkxbe-aQ7-KEKCRmcVyqPPy8ACnB3pXUpKmQnLWGlwSiWIIZKxqNer8PXFik3xK0TwsTGazYJkQmogMa0NPT8V2SqQ1xpYMTDpNJCEXBUVsKGWaQak3ZzBXWHmYePXNt0MZw&usqp=CAc'],
     ['Aspirador de Pó Vertical', 'Filtro HEPA, potente e leve', 349.00, 'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS0-oWZphEj8QSV93Avg6_9zjo5D3YvVWwwFGJHRjO0061Jyka5A2pjyZe2IrP4WZGVk2ozgEupseTUcj5N0UTWM6VO8GFoghGwCoW3wTEj8mioJJBYmIYRhEPKakHBZp_MTmyuCQ&usqp=CAc'],
     ['Liquidificador 900W', 'Com 12 velocidades e copo grande', 189.00, 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTBXYw2k46yKvvPS80ZZw-6If6jISj1GHRusEu8E9b41oy0cKtCZ5E9JYg5OL5Wml-VF4mclAz7gkuxqGcawy5ianAchI5cO0axb45MostM2eoaAiKlfO1BeSZ1GXhjjO9bx9khXg&usqp=CAc'],
-    ['Geladeira Electrolux Frost Free Multidoor Efficient Com Autosense e Inverter 590l', 5559.00, "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTKBf-pvMO4itbheZUIETtRxVoij7K-qtpDJkfYnOxVeXx34u47oNy0mRJqxDrQgFbL_WyrQley2gcz-m0qpOUpj4XoNzFPNtNWwsErB9NeZOTzvLmAccgHn1wBlFjqpT4MJjGkUH8&usqp=CAc"],
+    ['Liquidificador Mondial ', 'Com 12 velocidades e copo grande', 189.00, 'https://a-static.mlcdn.com.br/800x560/liquidificador-mondial-turbo-power-l-99-fb-3-veloc-550w-preto/techshop/liqmon00019/2c6d79bbe9480e21a22f3efae7837bed.jpeg'],
 
     ];
 $stmt = $db->prepare('INSERT INTO produtos (nome, descricao, preco, image_url) VALUES (:n,:d,:p,:i)');

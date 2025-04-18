@@ -12,7 +12,7 @@ class CarrinhoController
 {
     public function listar(Request $request, Response $response, array $args): Response {
         $userId = $args['userId'];
-
+    
         $itens = Capsule::table('carrinho')
             ->join('produtos', 'carrinho.produto_id', '=', 'produtos.id')
             ->where('carrinho.user_id', $userId)
@@ -23,13 +23,15 @@ class CarrinhoController
                 'carrinho.quantidade',
                 'produtos.nome as produto',
                 'produtos.preco',
-                'produtos.image_url'
+                'produtos.image_url',
+                Capsule::raw('(carrinho.quantidade * produtos.preco) as subtotal') // ✅ cálculo direto no SQL
             )
             ->get();
-
+    
         $response->getBody()->write($itens->toJson());
         return $response->withHeader('Content-Type', 'application/json');
     }
+    
 
     public function adicionarItem(Request $request, Response $response, array $args): Response {
         $body = $request->getParsedBody();
