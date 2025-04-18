@@ -3,6 +3,8 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
 
 // 1) Boot Eloquent
 $capsule = new Capsule;
