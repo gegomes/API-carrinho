@@ -1,21 +1,16 @@
 <?php
 $db = new SQLite3(__DIR__ . '/../database/carrinho.sqlite');
 
-// Remove a tabela antiga (opcional se estiver testando)
+// Remove a tabela carrinho (caso esteja testando)
 $db->exec('DROP TABLE IF EXISTS carrinho');
 
-
-// Cria tabela de compras finalizadas
-$db->exec('CREATE TABLE IF NOT EXISTS compras_finalizadas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    total REAL NOT NULL,
-    finalizado_em TEXT
-)');
-
-
+// Remove a tabela de compras finalizadas (caso esteja testando)
 $db->exec('DROP TABLE IF EXISTS compras_finalizadas');
 
+// Remove a tabela de produtos (evita duplicações no catálogo)
+$db->exec('DROP TABLE IF EXISTS produtos');
+
+// Cria tabela de compras finalizadas
 $db->exec('CREATE TABLE IF NOT EXISTS compras_finalizadas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -24,8 +19,15 @@ $db->exec('CREATE TABLE IF NOT EXISTS compras_finalizadas (
     itens_json TEXT
 )');
 
+// Cria a tabela carrinho (temporária até finalizar a compra)
+$db->exec('CREATE TABLE IF NOT EXISTS carrinho (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    produto_id INTEGER NOT NULL,
+    quantidade INTEGER NOT NULL
+)');
 
-// criar tabela de produtos (catálogo)
+// Cria tabela de produtos (catálogo)
 $db->exec('CREATE TABLE IF NOT EXISTS produtos (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     nome        TEXT    NOT NULL,
@@ -34,7 +36,7 @@ $db->exec('CREATE TABLE IF NOT EXISTS produtos (
     image_url   TEXT    NULL
 )');
 
-// 2) POPULAÇÃO COM DADOS DE EXEMPLO
+// Popula com dados de exemplo
 $produtos = [
     ['Camisa de gola P', '100% algodão P',      55.00,   null],
     ['Calça Jeans',       'Jeans azul escura', 120.00, 'https://via.placeholder.com/150'],
