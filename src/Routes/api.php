@@ -12,6 +12,7 @@ return function (App $app) {
     $app->get('/carrinho/{userId}', [CarrinhoController::class, 'listar']);
     $app->delete('/carrinho/{userId}/item/{id}', [CarrinhoController::class, 'removerItem']);
     $app->delete('/carrinho/{userId}/limpar', [CarrinhoController::class, 'limpar']);
+    $app->post('/carrinho/{userId}/item', [CarrinhoController::class, 'adicionarItem']);
 
     // Rotas para Compras
     $app->post('/carrinho/{userId}/finalizar', [CompraController::class, 'finalizarCompra']);
