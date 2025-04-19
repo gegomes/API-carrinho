@@ -15,10 +15,14 @@ return function (App $app) {
     $app->post('/carrinho/{userId}/item', [CarrinhoController::class, 'adicionarItem']);
 
     // Rotas para Compras
-    $app->post('/carrinho/{userId}/finalizar', [CompraController::class, 'finalizarCompra']);
+ 
+    $app->post('/carrinho/{userId}/finalizar', [CarrinhoController::class, 'finalizar']);
     $app->get('/compras/{userId}', [CompraController::class, 'listarCompras']);
 
     // Rotas para Produtos
     $app->get('/produtos', [ProdutoController::class, 'listar']);
     $app->get('/produtos/{id}', [ProdutoController::class, 'obter']);
+
+    // Rota para finalizar a compra do carrinho
+
 };

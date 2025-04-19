@@ -32,7 +32,6 @@ class CarrinhoController
         return $response->withHeader('Content-Type', 'application/json');
     }
     
-
     public function adicionarItem(Request $request, Response $response, array $args): Response {
         $body = $request->getParsedBody();
         $produto_id = (int)($body['produto_id'] ?? 0);
@@ -87,4 +86,47 @@ class CarrinhoController
         $response->getBody()->write(json_encode(['success' => true]));
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public function finalizar(Request $request, Response $response, array $args): Response {
+        $userId = (int)$args['userId'];
+    
+        // Busca itens do carrinho com detalhes
+        $itens = Capsule::table('carrinho')
+            ->join('produtos', 'carrinho.produto_id', '=', 'produtos.id')
+            ->where('carrinho.user_id', $userId)
+            ->select(
+                'carrinho.id',
+                'carrinho.produto_id',
+                'carrinho.quantidade',
+                'produtos.nome as produto',
+                'produtos.preco',
+                'produtos.image_url',
+                Capsule::raw('(carrinho.quantidade * produtos.preco) as subtotal')
+            )
+            ->get();
+    
+        // Verifica se o carrinho está vazio
+        if ($itens->isEmpty()) {
+            $response->getBody()->write(json_encode(['error' => 'Carrinho está vazio.']));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+    
+        // Calcula total
+        $total = $itens->sum('subtotal');
+    
+        // Registra a compra finalizada
+        Capsule::table('compras_finalizadas')->insert([
+            'user_id' => $userId,
+            'total' => $total,
+            'finalizado_em' => date('Y-m-d H:i:s'),
+            'itens_json' => json_encode($itens),
+        ]);
+    
+        // Limpa o carrinho
+        Capsule::table('carrinho')->where('user_id', $userId)->delete();
+    
+        $response->getBody()->write(json_encode(['success' => true, 'message' => 'Compra finalizada com sucesso!']));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+    
 }
